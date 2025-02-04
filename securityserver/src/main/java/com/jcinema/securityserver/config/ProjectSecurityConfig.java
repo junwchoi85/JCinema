@@ -17,7 +17,8 @@ import org.springframework.security.web.authentication.password.HaveIBeenPwnedRe
 public class ProjectSecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrfConfig -> csrfConfig.disable())
+        http.requiresChannel((requiresChannel) -> requiresChannel.anyRequest().requiresInsecure()) // disable https
+            .csrf(csrfConfig -> csrfConfig.disable())
             .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/hi", "/").authenticated()
                 .requestMatchers("/welcome", "/register").permitAll());
