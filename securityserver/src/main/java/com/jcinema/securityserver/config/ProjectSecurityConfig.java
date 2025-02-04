@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
+import com.jcinema.securityserver.excptionhandling.CustomAccessDeniedHandler;
 import com.jcinema.securityserver.excptionhandling.CustomBasicAuthenticationEntryPoint;
 
 @Configuration
@@ -20,20 +21,25 @@ public class ProjectSecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.requiresChannel((requiresChannel) -> requiresChannel.anyRequest().requiresInsecure()) // disable https
-            .csrf(csrfConfig -> csrfConfig.disable())
-            .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/hi", "/", "/myAccount").authenticated()
-                .requestMatchers("/welcome", "/register").permitAll());
+                .csrf(csrfConfig -> csrfConfig.disable())
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/hi", "/", "/myAccount").authenticated()
+                        .requestMatchers("/welcome", "/register").permitAll());
         http.formLogin(withDefaults());
-        http.httpBasic(httpBasicConfig -> httpBasicConfig.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
+        http.httpBasic(
+                httpBasicConfig -> httpBasicConfig.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
+        http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler())
+                // .accessDeniedPage("/access-denied") // Custom access denied page
+            );
+        // http.exceptionHandling(ehc -> ehc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())); // Global exception handling
         return http.build();
     }
 
     // @Bean
     // public UserDetailsService userDetailsService(DataSource dataSource) {
-    //     return new JdbcUserDetailsManager(dataSource);
+    // return new JdbcUserDetailsManager(dataSource);
     // }
-    
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
