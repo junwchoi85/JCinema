@@ -8,7 +8,11 @@ public class AccountController {
 
     @GetMapping("/")
     public  String getAccountDetails () {
-        return "Here are the account details from the DB";
+        return "/";
     }
 
+    @GetMapping("/myAccount")
+    public  String getMyAccount() {
+        return "Here are the account details from the DB!";
+    }
 }

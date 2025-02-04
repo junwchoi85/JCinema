@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
+import com.jcinema.securityserver.excptionhandling.CustomBasicAuthenticationEntryPoint;
+
 @Configuration
 @Profile("!prod")
 public class ProjectSecurityConfig {
@@ -20,10 +22,10 @@ public class ProjectSecurityConfig {
         http.requiresChannel((requiresChannel) -> requiresChannel.anyRequest().requiresInsecure()) // disable https
             .csrf(csrfConfig -> csrfConfig.disable())
             .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/hi", "/").authenticated()
+                .requestMatchers("/hi", "/", "/myAccount").authenticated()
                 .requestMatchers("/welcome", "/register").permitAll());
         http.formLogin(withDefaults());
-        http.httpBasic(withDefaults());
+        http.httpBasic(httpBasicConfig -> httpBasicConfig.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
         return http.build();
     }
 
