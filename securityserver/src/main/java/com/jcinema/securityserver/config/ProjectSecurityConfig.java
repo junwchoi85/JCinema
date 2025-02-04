@@ -20,11 +20,12 @@ import com.jcinema.securityserver.excptionhandling.CustomBasicAuthenticationEntr
 public class ProjectSecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.requiresChannel((requiresChannel) -> requiresChannel.anyRequest().requiresInsecure()) // disable https
-                .csrf(csrfConfig -> csrfConfig.disable())
-                .authorizeHttpRequests((requests) -> requests
+        http.sessionManagement(smc->smc.invalidSessionUrl("/invalidSession"))
+            .requiresChannel((requiresChannel) -> requiresChannel.anyRequest().requiresInsecure()) // disable https
+            .csrf(csrfConfig -> csrfConfig.disable())
+            .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/hi", "/", "/myAccount").authenticated()
-                        .requestMatchers("/welcome", "/register").permitAll());
+                        .requestMatchers("/welcome", "/register", "/invalidSession").permitAll());
         http.formLogin(withDefaults());
         http.httpBasic(
                 httpBasicConfig -> httpBasicConfig.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
