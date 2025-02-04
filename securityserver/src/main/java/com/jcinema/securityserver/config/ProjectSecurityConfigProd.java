@@ -19,7 +19,12 @@ import com.jcinema.securityserver.excptionhandling.CustomBasicAuthenticationEntr
 public class ProjectSecurityConfigProd {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.sessionManagement(smc->smc.invalidSessionUrl("/invalidSession"))
+        http.sessionManagement(
+                smc->smc.invalidSessionUrl("/invalidSession")
+                        .maximumSessions(1) // Only 1 session per user
+                        .maxSessionsPreventsLogin(true) // Prevents login if user already has a session
+                        // .expiredUrl("/expiredSession") // Redirect to this URL if session is expired
+                )
             .requiresChannel((requiresChannel) -> requiresChannel.anyRequest().requiresSecure()) // enable https
             .csrf(csrfConfig -> csrfConfig.disable())
             .authorizeHttpRequests((requests) -> requests
